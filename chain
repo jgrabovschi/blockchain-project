@@ -2,6 +2,7 @@
 
 from hashlib import sha256
 import json
+import time
 
 class Block:
     def __init__(self, data, previous_hash):
@@ -46,3 +47,16 @@ blockchain.print_chain()
 
 print(blockchain.get_first_block_hash())
 print(blockchain.get_last_block_hash())
+
+while (True):
+    for block in blockchain.chain:
+        if block.hash != block.calc_hash():
+            print("Blockchain is invalid")
+            break
+        if blockchain.chain.index(block) == 0:
+            continue
+        if block.previous_hash != blockchain.chain[blockchain.chain.index(block) - 1].hash:
+            print("Blockchain is invalid")
+            break
+    print("Blockchain is valid")
+    time.sleep(1)

@@ -1,11 +1,11 @@
-from hashlib import sha256
+from hashlib import *
 import json
+import time
 
 class Block:
     def __init__(self, data, previous_hash):
         self.data = data
         self.previous_hash = previous_hash
-        self.hash = self.calc_hash()
 
     def calc_hash(self):
         return sha256(self.data.encode()).hexdigest()
@@ -21,25 +21,17 @@ class Blockchain:
         self.last_block = self.first_block = self.chain[0]
 
     def add_block(self, data):
-        self.chain.append(Block(data, self.chain[-1].hash))
+        self.chain.append(Block(data, self.chain[-1].calc_hash()))
         self.last_block = self.chain[len(self.chain) - 1]
 
     def print_chain(self):
         print(json.dumps(self.chain, indent=4, default=lambda x: x.__dict__))
-
-    def get_first_block_hash(self):
-        return self.first_block.hash
-
-    def get_last_block_hash(self):
-        return self.last_block.hash
     
     def verify_integrity(self):
         for block in self.chain:
-            if block.hash != block.calc_hash():
-                return False
             if self.chain.index(block) == 0:
                 continue
-            if block.previous_hash != self.chain[self.chain.index(block) - 1].hash:
+            if block.previous_hash != self.chain[self.chain.index(block) - 1].calc_hash():
                 return False
         return True
     
@@ -57,3 +49,49 @@ class Blockchain:
             self.first_block = self.chain[0]
             self.last_block = self.chain[len(self.chain) - 1]
         print("Done.")
+
+def maintenance(blockchain):
+    try:
+        startup(blockchain)
+
+        while (True):
+            if blockchain.verify_integrity():
+                print("Blockchain is valid")
+                blockchain.save_chain()
+            else:
+                print("ALERT: Blockchain was compromised")
+                print("Do you want to restore it from the last save? (y/n)")
+                choice = input("> ")
+
+                if choice.upper() == "Y":
+                    blockchain.load_chain()
+                    blockchain.print_chain()
+                else:
+                    print("Do you want to create a new blockchain? (y/n)")
+                    choice = input("> ")
+
+                    if choice.upper() == "Y":
+                        blockchain = Blockchain()
+                        blockchain.save_chain()
+                    else:
+                        print("Exiting...")
+                        exit(0)
+
+            time.sleep(1)
+
+    except KeyboardInterrupt:
+            print("\n\n\nExiting...")
+            if (blockchain.verify_integrity()):
+                blockchain.save_chain()
+
+def startup(blockchain):
+    while (True):
+        print("Do you want to create a new blockchain or load an existing one? (new/load)")
+        choice = input("> ")
+        if choice.upper() == "NEW":
+            blockchain.save_chain()
+            break
+        elif choice.upper() == "LOAD":
+            blockchain.load_chain()
+            blockchain.print_chain()
+            break

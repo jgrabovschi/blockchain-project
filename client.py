@@ -4,7 +4,7 @@ from hashlib import sha256
 import os
 
 # BLOCKCHAIN NETWORK
-HOSTS = ["10.0.1.1"]#, "10.0.0.2", "10.0.0.1"] 
+HOSTS = ["10.0.1.1", "10.0.0.1"]#, "10.0.0.2"] 
 PORT_MESSAGES = 12345  # The port used by the network to send messages
 PORT_ACCEPT = 12346
 
@@ -36,11 +36,11 @@ def client():
             message = Message(data, signature)
             s.sendall(json.dumps(message.__dict__).encode())
 
-            data = s.recv(1024)
+            response = s.recv(1024)
 
-            ids.append(data.decode())
+            ids.append(response.decode())
 
-            if data.decode() != "-1":
+            if response.decode() != "-1":
                 accepts += 1
 
     accepted_percentage = (accepts / len(HOSTS)) * 100

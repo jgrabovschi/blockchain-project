@@ -15,8 +15,9 @@ class Message:
 
 def server(pending_transactions):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        id = 0
         s.bind((HOST, PORT))
-        s.listen()
+        s.listen(3)
         while True:
             conn, addr = s.accept()
             with conn:
@@ -41,8 +42,9 @@ def server(pending_transactions):
                 if signature == message.signature:
                     message.data = 'Client ' + addr[0] + ' - ' + message.data
 
-                    transaction = PendingTransaction(message, datetime.now(), len(pending_transactions))
-
+                    transaction = PendingTransaction(message, datetime.now(), id)
+                    id += 1
+                    
                     pending_transactions.append(transaction)
                     conn.sendall(str(transaction.id).encode())
                 else:

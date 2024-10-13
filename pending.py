@@ -1,4 +1,4 @@
-from datetime import *
+from datetime import datetime
 import time
 import socket
 
@@ -26,30 +26,40 @@ def verify_pending(pending_transactions, blockchain):
 
             if pending.accepted == 'Yes':
                 blockchain.add_block(pending.message.data)
-                print('[PENDING_VERRIFIED] block added')
+                print('[PENDING_VERIFIED] block added')
 
             pending_transactions.remove(pending)
-            
+
         time.sleep(5)
 
-
 def accept_pending(pending_transactions):        
-        # This function will be responsible for managing the pending transactions.
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.bind((HOST, PORT_ACCEPT))
-            s.listen()
-            while (True):
-                conn, addr = s.accept()
-                with conn:
-                    print('[PENDING] Connected by', addr)
-                    data = conn.recv(1024)
-                    if not data:
-                        break
-                    
-                    if data.decode() != '-1':
-                        pending_transactions[int(data.decode())].accepted = 'Yes'
-                        print('[PENDING] Transaction ' + data.decode() + ' accepted')
-                    else:
-                        pending_transactions[int(data.decode())].accepted = 'No'
-                        print('[PENDING] Transaction ' + data.decode() + ' rejected')
-    
+    # This function will be responsible for managing the pending transactions.
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.bind((HOST, PORT_ACCEPT))
+        s.listen(len(pending_transactions))
+        while (True):
+            conn, addr = s.accept()
+            with conn:
+                print('[PENDING] Connected by', addr)
+                data = conn.recv(1024)
+                if not data:
+                    break            
+                
+                id = int(data.decode())
+                
+                if id != -1:
+                    for pending in pending_transactions:
+                        if pending.id == id:
+                            index = pending_transactions.index(pending)
+                            pending_transactions[index].accepted = 'Yes'
+                            break
+                    print('[PENDING] Transaction ' + data.decode() + ' accepted')
+                else:
+                    for pending in pending_transactions:
+                        if pending.id == id:
+                            index = pending_transactions.index(pending)
+                            pending_transactions[index].accepted = 'No'
+                            break
+                    print('[PENDING] Transaction ' + data.decode() + ' rejected')
+                
+            

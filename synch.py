@@ -1,17 +1,17 @@
 import socket
 import json
-from chain import *
+import time
+from chain import Blockchain, Block  # Assuming these are the relevant classes
 
 PORT_SYNCHRONIZE = 12347  # The port used by the network to synchronize the blockchain
 IP_ADDRESS = "10.0.1.1"
-HOSTS = ["10.0.1.1"]  # The IP addresses of the blockchain network
-
+HOSTS = ["10.0.1.1", "10.0.0.1"]  # The IP addresses of the blockchain network
 
 def server(blockchain):
     #ALSO CREATES A SOCKET TO SEND THE BLOCKCHAIN FOR THE SERVERS TO SYNCHRONIZE
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.bind((IP_ADDRESS, PORT_SYNCHRONIZE))
-        s.listen()
+        s.listen(len(HOSTS))
         while True:
             conn, addr = s.accept()
             with conn:
@@ -23,22 +23,41 @@ def server(blockchain):
                 print("[SERVER-SYNC] Received", data)
 
                 if data.decode() == "sync":
-                    conn.sendall(json.dumps(blockchain.chain, default=lambda x: x.__dict__).encode())
+                    # Serialize the blockchain
+                    serialized_chain = json.dumps([block.__dict__ for block in blockchain.chain])
+                    conn.sendall(serialized_chain.encode())
                 else:
                     conn.sendall("error".encode())
 
 def client(blockchain):
     while True:
+        time.sleep(5)
         #CREATE A SOCKET TO RECEIVE DATABASES AND SYNCHRONIZE
         blockchains = []
 
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            for HOST in HOSTS:
+        for HOST in HOSTS:        
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 s.connect((HOST, PORT_SYNCHRONIZE))
                 s.sendall("sync".encode())
-                data = s.recv(1024)
+                
+                # Receive data in chunks and ensure complete JSON string
+                data = b""
+                while True:
+                    chunk = s.recv(2048)
+                    if not chunk:
+                        break
+                    data += chunk
+                    try:
+                        json_data = json.loads(data)
+                        break
+                    except json.JSONDecodeError:
+                        continue
+                
                 print("[CLIENT-SYNC] Received", data.decode())
-                blockchains.append(json.loads(data.decode()))
+                
+                # Deserialize the JSON data back into Block instances
+                deserialized_chain = [Block(**block) for block in json_data]
+                blockchains.append(deserialized_chain)
 
         #COMPARE THE BLOCKCHAINS AND CHOOSE THE LONGEST
         longest = blockchain.chain
@@ -54,7 +73,3 @@ def client(blockchain):
             print("Blockchain synchronized")
         else:
             print("Blockchain already synchronized")
-        
-        time.sleep(5)
-
-    

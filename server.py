@@ -1,42 +1,52 @@
 import socket
 import json
 from chain import *
+from datetime import datetime
+from pending import *
 
-HOST = "192.168.1.118"
+HOST = "10.0.1.1"
 PORT = 12345
 password = '09cc3fc8ac3cb63aebf89b85a45488ba9a681b822778941e12ec4b963b453e33'
 
 class Message:
-    def __init__(self):
+    def __init__(self,):
         self.data = ""
         self.signature = ""
 
-
-def server(blockchain):
+def server(pending_transactions):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.bind((HOST, PORT))
         s.listen()
         while True:
             conn, addr = s.accept()
             with conn:
-                print("Connected by", addr)
-                while True:
-                    data = conn.recv(1024)
-                    if not data:
-                        break
-                    print("Received", data)
+                print("[SERVER] Connected by", addr)
+                
+                data = conn.recv(1024)
+                if not data:
+                    break
+                print("[SERVER] Received", data)
 
-                    message = Message()
-                    message.data = json.loads(data.decode())['data']
-                    message.signature = json.loads(data.decode())['signature']
+                #CREATE A MESSAGE OBJECT FROM THE RECEIVED JSON
+                message = Message()
+                message.data = json.loads(data.decode())['data']
+                message.signature = json.loads(data.decode())['signature']
+                
+                #VERIFY THE SIGNATURE
+                signature = sha256((message.data + password).encode()).hexdigest()
 
-                    signature = sha256((message.data + password).encode()).hexdigest()
+                #IF THE SIGNATURE IS RIGHT THE MESSAGE IS PUT IN THE 
+                #PENDING TRANSACTIONS AND THE SERVER SENDS THE PENDING TRANSACTION ID (>=0)
+                #IF NOT, IT SENDS -1
+                if signature == message.signature:
+                    message.data = 'Client ' + addr[0] + ' - ' + message.data
 
-                    if signature == message.signature:
-                        blockchain.add_block(message.data)
-                        conn.sendall(b'OK')
-                    else:
-                        print('>>> INVALID TRANSACTION')
-                        conn.sendall(b'INVALID TRANSACTION')
+                    transaction = PendingTransaction(message, datetime.now(), len(pending_transactions))
+
+                    pending_transactions.append(transaction)
+                    conn.sendall(str(transaction.id).encode())
+                else:
+                    print('>>> INVALID TRANSACTION')
+                    conn.sendall("-1".encode())
 
                     

@@ -23,6 +23,7 @@ class Blockchain:
     def add_block(self, data):
         self.chain.append(Block(data, self.chain[-1].calc_hash()))
         self.last_block = self.chain[len(self.chain) - 1]
+        self.save_chain()
 
     def print_chain(self):
         print(json.dumps(self.chain, indent=4, default=lambda x: x.__dict__))

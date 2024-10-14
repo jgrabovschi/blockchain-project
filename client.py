@@ -2,6 +2,7 @@ import socket
 import json
 from hashlib import sha256
 import os
+import server
 
 # BLOCKCHAIN NETWORK
 HOSTS = ["10.0.1.1", "10.0.0.1"]#, "10.0.0.2"] 
@@ -38,10 +39,9 @@ def client():
 
             response = s.recv(1024)
 
-            ids.append(response.decode())
+            ids.append(json.loads(response.decode())['id'])
 
-            if response.decode() != "-1":
-                accepts += 1
+            accepts += json.loads(response.decode())['accepted']
 
     accepted_percentage = (accepts / len(HOSTS)) * 100
 

@@ -13,6 +13,11 @@ class Message:
         self.data = ""
         self.signature = ""
 
+class Response:
+    def __init__(self, id, accepted):
+        self.id = id
+        self.accepted = accepted
+
 def server(pending_transactions):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         id = 0
@@ -36,19 +41,23 @@ def server(pending_transactions):
                 #VERIFY THE SIGNATURE
                 signature = sha256((message.data + password).encode()).hexdigest()
 
-                #IF THE SIGNATURE IS RIGHT THE MESSAGE IS PUT IN THE 
-                #PENDING TRANSACTIONS AND THE SERVER SENDS THE PENDING TRANSACTION ID (>=0)
-                #IF NOT, IT SENDS -1
-                if signature == message.signature:
-                    message.data = 'Client ' + addr[0] + ' - ' + message.data
+                #THE MESSAGE IS PUT IN THE 
+                #PENDING TRANSACTIONS AND THE SERVER SENDS THE PENDING TRANSACTION ID 
+                #IF THE SIGNATURE IS CORRECT
+                #IT SENDS A FLAG OF 1 (ACCEPTED)
+                #IF NOT, IT SENDS 0 (REJECTED)
+                message.data = 'Client ' + addr[0] + ' - ' + message.data
 
-                    transaction = PendingTransaction(message, datetime.now(), id)
-                    id += 1
-                    
-                    pending_transactions.append(transaction)
-                    conn.sendall(str(transaction.id).encode())
+                transaction = PendingTransaction(message, datetime.now(), id)
+                id += 1
+                
+                pending_transactions.append(transaction)
+
+                if signature == message.signature:
+                    response = Response(transaction.id, 1)
                 else:
-                    print('>>> INVALID TRANSACTION')
-                    conn.sendall("-1".encode())
+                    response = Response(transaction.id, 0)
+
+                conn.sendall(json.dumps(response.__dict__).encode())
 
                     

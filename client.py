@@ -5,7 +5,7 @@ import os
 import server
 
 # BLOCKCHAIN NETWORK
-HOSTS = ["10.0.1.1", "10.0.0.1"]#, "10.0.0.2"] 
+HOSTS = ["10.0.1.1", "10.0.0.1", "10.0.0.2"] 
 PORT_MESSAGES = 12345  # The port used by the network to send messages
 PORT_ACCEPT = 12346
 
@@ -42,6 +42,7 @@ def client():
             ids.append(json.loads(response.decode())['id'])
 
             accepts += json.loads(response.decode())['accepted']
+            print
 
     accepted_percentage = (accepts / len(HOSTS)) * 100
 
@@ -52,7 +53,7 @@ def client():
         for HOST in HOSTS:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 s.connect((HOST, PORT_ACCEPT))
-                s.sendall(ids[HOSTS.index(HOST)].encode())
+                s.sendall(str(ids[HOSTS.index(HOST)]).encode())
          
      
 

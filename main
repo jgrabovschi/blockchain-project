@@ -14,7 +14,7 @@ if __name__ == "__main__":
     t1 = threading.Thread(target=server, args=(pending_transactions,))
     t2 = threading.Thread(target=maintenance, args=(bc,))
     t3 = threading.Thread(target=synch.server, args=(bc,))
-    t4 = threading.Thread(target=synch.client, args=(bc,))
+    t4 = threading.Thread(target=synch.client, args=(bc, pending_transactions, ))
     t5 = threading.Thread(target=accept_pending, args=(pending_transactions,))
     t6 = threading.Thread(target=verify_pending, args=(pending_transactions, bc))
 

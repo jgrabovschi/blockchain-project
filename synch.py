@@ -5,7 +5,7 @@ from chain import Blockchain, Block  # Assuming these are the relevant classes
 
 PORT_SYNCHRONIZE = 12347  # The port used by the network to synchronize the blockchain
 IP_ADDRESS = "10.0.1.1"
-HOSTS = ["10.0.1.1", "10.0.0.1"]  # The IP addresses of the blockchain network
+HOSTS = ["10.0.1.1", "10.0.0.1", "10.0.0.2"]  # The IP addresses of the blockchain network
 
 def server(blockchain):
     #ALSO CREATES A SOCKET TO SEND THE BLOCKCHAIN FOR THE SERVERS TO SYNCHRONIZE
@@ -29,7 +29,7 @@ def server(blockchain):
                 else:
                     conn.sendall("error".encode())
 
-def client(blockchain):
+def client(blockchain, pending_transactions):
     while True:
         time.sleep(5)
         #CREATE A SOCKET TO RECEIVE DATABASES AND SYNCHRONIZE
@@ -61,9 +61,12 @@ def client(blockchain):
 
         #COMPARE THE BLOCKCHAINS AND CHOOSE THE LONGEST
         longest = blockchain.chain
+        longest_size = len(blockchain.chain) + len(pending_transactions)
+
         for chain in blockchains:
-            if len(chain) > len(longest):
+            if len(chain) > longest_size:
                 longest = chain
+                longest_size = len(chain)
 
         #IF THE LONGEST IS NOT THE LOCAL BLOCKCHAIN, REPLACE IT
         if longest != blockchain.chain:

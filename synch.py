@@ -4,13 +4,12 @@ import time
 from chain import Blockchain, Block  # Assuming these are the relevant classes
 
 PORT_SYNCHRONIZE = 12347  # The port used by the network to synchronize the blockchain
-IP_ADDRESS = "10.0.1.1"
 HOSTS = ["10.0.1.1", "10.0.0.1", "10.0.0.2"]  # The IP addresses of the blockchain network
 
-def server(blockchain):
-    #ALSO CREATES A SOCKET TO SEND THE BLOCKCHAIN FOR THE SERVERS TO SYNCHRONIZE
+def server(blockchain, host):
+    # CREATES A SOCKET TO SEND THE BLOCKCHAIN FOR THE SERVERS TO SYNCHRONIZE
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.bind((IP_ADDRESS, PORT_SYNCHRONIZE))
+        s.bind((host, PORT_SYNCHRONIZE))
         s.listen(len(HOSTS))
         while True:
             conn, addr = s.accept()
@@ -31,7 +30,7 @@ def server(blockchain):
 
 def client(blockchain, pending_transactions):
     while True:
-        time.sleep(5)
+        time.sleep(15)
         #CREATE A SOCKET TO RECEIVE DATABASES AND SYNCHRONIZE
         blockchains = []
 

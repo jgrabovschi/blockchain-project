@@ -1,3 +1,5 @@
+#!usr/bin/env python3
+
 import socket
 import json
 from hashlib import sha256
@@ -30,19 +32,24 @@ def client():
 
     # SEND DATA TO ALL NODES
     for HOST in HOSTS:
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.connect((HOST, PORT_MESSAGES))
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.connect((HOST, PORT_MESSAGES))
 
-            signature = sha256((data + '09cc3fc8ac3cb63aebf89b85a45488ba9a681b822778941e12ec4b963b453e33').encode()).hexdigest()
-            message = Message(data, signature)
-            s.sendall(json.dumps(message.__dict__).encode())
+                # THIS CLIENT USES A CORRECT PASSWORD AND ALGORITHM
+                signature = sha256((data + '09cc3fc8ac3cb63aebf89b85a45488ba9a681b822778941e12ec4b963b453e33').encode()).hexdigest()
+                message = Message(data, signature)
+                s.sendall(json.dumps(message.__dict__).encode())
 
-            response = s.recv(1024)
+                response = s.recv(1024)
 
-            ids.append(json.loads(response.decode())['id'])
+                ids.append(json.loads(response.decode())['id'])
 
-            accepts += json.loads(response.decode())['accepted']
-            print
+                accepts += json.loads(response.decode())['accepted']
+        except:
+            print('[CLIENT] Connection error with ' + HOST)
+            continue
+            
 
     accepted_percentage = (accepts / len(HOSTS)) * 100
 
@@ -51,10 +58,13 @@ def client():
     # IF THE MAJORITY OF THE NODES ACCEPT THE MESSAGE, SEND THE ID THAT WILL BE USED TO ACCEPT THE TRANSACTION
     if accepted_percentage > 50:
         for HOST in HOSTS:
-            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-                s.connect((HOST, PORT_ACCEPT))
-                s.sendall(str(ids[HOSTS.index(HOST)]).encode())
-         
+            try:
+                with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                    s.connect((HOST, PORT_ACCEPT))
+                    s.sendall(str(ids[HOSTS.index(HOST)]).encode())
+            except:
+                print('[CLIENT] Connection error with ' + HOST)
+                continue
      
 
 

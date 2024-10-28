@@ -4,7 +4,7 @@ from chain import *
 from datetime import datetime
 from pending import *
 
-HOST = "10.0.1.1"
+
 PORT = 12345
 password = '09cc3fc8ac3cb63aebf89b85a45488ba9a681b822778941e12ec4b963b453e33'
 
@@ -18,10 +18,10 @@ class Response:
         self.id = id
         self.accepted = accepted
 
-def server(pending_transactions):
+def server(pending_transactions, host):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         id = 0
-        s.bind((HOST, PORT))
+        s.bind((host, PORT))
         s.listen(3)
         while True:
             conn, addr = s.accept()
@@ -60,4 +60,4 @@ def server(pending_transactions):
 
                 conn.sendall(json.dumps(response.__dict__).encode())
 
-                    
+                

@@ -9,11 +9,9 @@ class PendingTransaction:
         self.id = id
         self.accepted = 'Not Yet'
 
-HOST = '10.0.1.1'
 PORT_ACCEPT = 12346 
-TTL = 5 #IN MINUTES
 
-def verify_pending(pending_transactions, blockchain):
+def verify_pending(pending_transactions, blockchain, ttl):
     # This function will be responsible for verifying the pending transactions
     while(True):
         print(pending_transactions)
@@ -21,7 +19,7 @@ def verify_pending(pending_transactions, blockchain):
             now = datetime.now()
             difference = now - pending.timestamp
 
-            if difference.seconds / 60 < TTL and pending.accepted == 'Not Yet':
+            if difference.seconds / 60 < ttl and pending.accepted == 'Not Yet':
                 continue
 
             if pending.accepted == 'Yes':
@@ -32,10 +30,11 @@ def verify_pending(pending_transactions, blockchain):
 
         time.sleep(5)
 
-def accept_pending(pending_transactions):        
+
+def accept_pending(pending_transactions, host):        
     # This function will be responsible for managing the pending transactions.
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.bind((HOST, PORT_ACCEPT))
+        s.bind((host, PORT_ACCEPT))
         s.listen(len(pending_transactions))
         while (True):
             conn, addr = s.accept()
@@ -61,5 +60,5 @@ def accept_pending(pending_transactions):
                             pending_transactions[index].accepted = 'No'
                             break
                     print('[PENDING] Transaction ' + data.decode() + ' rejected')
+
                 
-            

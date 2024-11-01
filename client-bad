@@ -37,7 +37,7 @@ def client():
                 s.connect((HOST, PORT_MESSAGES))
 
                 # USING WRONG SIGNATURE
-                signature = sha256('123123123'.encode()).encode().hexdigest()
+                signature = sha256('123123123'.encode()).hexdigest()
                 message = Message(data, signature)
                 
                 s.sendall(json.dumps(message.__dict__).encode())

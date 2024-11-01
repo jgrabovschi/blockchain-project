@@ -13,9 +13,7 @@ def server(blockchain, host):
         s.listen(len(HOSTS))
         while True:
             conn, addr = s.accept()
-            with conn:
-                print("[SERVER-SYNC] Connected by", addr)
-                
+            with conn:                
                 data = conn.recv(1024)
                 if not data:
                     break
@@ -51,8 +49,6 @@ def client(blockchain, pending_transactions):
                     except json.JSONDecodeError:
                         continue
                 
-                print("[CLIENT-SYNC] Received", data.decode())
-                
                 # Deserialize the JSON data back into Block instances
                 deserialized_chain = [Block(**block) for block in json_data]
                 blockchains.append(deserialized_chain)
@@ -73,4 +69,4 @@ def client(blockchain, pending_transactions):
             blockchain.last_block = longest[len(longest) - 1]
             print("Blockchain synchronized")
         else:
-            print("Blockchain already synchronized")
+            print("Blockchain already was synchronized")

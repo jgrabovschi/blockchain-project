@@ -19,7 +19,6 @@ def server(blockchain, host):
                 data = conn.recv(1024)
                 if not data:
                     break
-                print("[SERVER-SYNC] Received", data)
 
                 if data.decode() == "sync":
                     # Serialize the blockchain

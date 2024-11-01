@@ -14,7 +14,6 @@ PORT_ACCEPT = 12346
 def verify_pending(pending_transactions, blockchain, ttl):
     # This function will be responsible for verifying the pending transactions
     while(True):
-        print(pending_transactions)
         for pending in pending_transactions:
             now = datetime.now()
             difference = now - pending.timestamp
@@ -27,6 +26,7 @@ def verify_pending(pending_transactions, blockchain, ttl):
                 print('[PENDING_VERIFIED] block added')
 
             pending_transactions.remove(pending)
+            print(pending_transactions)
 
         time.sleep(5)
 

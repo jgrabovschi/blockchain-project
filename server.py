@@ -52,6 +52,7 @@ def server(pending_transactions, host):
                 id += 1
                 
                 pending_transactions.append(transaction)
+                print(pending_transactions)
 
                 if signature == message.signature:
                     response = Response(transaction.id, 1)

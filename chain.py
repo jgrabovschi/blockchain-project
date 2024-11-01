@@ -37,10 +37,8 @@ class Blockchain:
         return True
     
     def save_chain(self):
-        print("Saving chain to file...")
         with open('./chain.json', "w") as file:
             file.write(json.dumps(self.chain, default=lambda x: x.__dict__))
-        print("Done.")
 
     def load_chain(self):
         print("Loading chain from file...")
@@ -57,7 +55,6 @@ def maintenance(blockchain):
 
         while (True):
             if blockchain.verify_integrity():
-                print("Blockchain is valid")
                 blockchain.save_chain()
             else:
                 print("ALERT: Blockchain was compromised")

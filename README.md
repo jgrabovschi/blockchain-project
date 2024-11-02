@@ -48,6 +48,9 @@ To send data to the blockchain you only need to run the *client* script:
 > [!NOTE]
 > This project also comes with a bad client if you want to test it.
 
+## Demo
+
+You can watch a demo of this project [here](https://www.youtube.com/watch?v=wvKM2mQaUQc&t=1s&ab_channel=JorgeGrabovschi).
 
 ## Main Issues and Challenges
 

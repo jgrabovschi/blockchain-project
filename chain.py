@@ -18,11 +18,9 @@ class Blockchain:
 
     def create_genesis_block(self):
         self.chain.append(Block("Genesis Block", "0"))
-        self.last_block = self.first_block = self.chain[0]
 
     def add_block(self, data):
         self.chain.append(Block(data, self.chain[-1].calc_hash()))
-        self.last_block = self.chain[len(self.chain) - 1]
         self.save_chain()
 
     def print_chain(self):
@@ -45,8 +43,6 @@ class Blockchain:
         with open('./chain.json', "r") as file:
             self.chain = json.load(file)
             self.chain = [Block(block['data'], block['previous_hash']) for block in self.chain]
-            self.first_block = self.chain[0]
-            self.last_block = self.chain[len(self.chain) - 1]
         print("Done.")
 
 def maintenance(blockchain):

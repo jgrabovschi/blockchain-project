@@ -65,8 +65,6 @@ def client(blockchain, pending_transactions):
         #IF THE LONGEST IS NOT THE LOCAL BLOCKCHAIN, REPLACE IT
         if longest != blockchain.chain:
             blockchain.chain = longest
-            blockchain.first_block = longest[0]
-            blockchain.last_block = longest[len(longest) - 1]
             print("Blockchain synchronized")
         else:
             print("Blockchain already was synchronized")

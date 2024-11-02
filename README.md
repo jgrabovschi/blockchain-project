@@ -55,4 +55,4 @@ You can watch a demo of this project [here](https://www.youtube.com/watch?v=wvKM
 ## Main Issues and Challenges
 
 - The algorithm and password to create the signature is exposed on this repo, so it's not that secure.
-- You need to run all of the nodes that are on the HOSTS array (in the *client*, *client-bad* and *synch.py* files), it won't work correctly if you don't. That is because the platform doesn't have a Node Discovery algorithm.
+- You need to run all of the nodes that are on the HOSTS array (in the *client*, *client-bad* and *synch.py* files), it won't work correctly if you don't run all of them. That is because the platform doesn't have a Node Discovery algorithm.

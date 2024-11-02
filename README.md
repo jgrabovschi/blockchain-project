@@ -3,7 +3,7 @@
 
 # Blockchain Project
 
-This is a blockchain platform that I made to learn how the blockchains work and to make a lighter application. It implements many blockchain mechanisms and it uses the PoA consensus algorithm.
+This is a blockchain platform that I made to learn how the blockchains work and to make a lighter application. It implements many blockchain mechanisms and it uses the PoA consensus algorithm. The platform itself stores information about the clients' disk usage. The clients should support the *df* utility.
 
 The code that I made is working for the the following topology:
 

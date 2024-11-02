@@ -36,6 +36,8 @@ Now you only need to run the *main* script, it will prompt a message asking if y
 Do you want to create a new blockchain or load an existing one? (new/load)
 >
 ```
+You need to type *new* or *load*
+
 ### Client
 To send data to the blockchain you only need to run the *client* script:
 
